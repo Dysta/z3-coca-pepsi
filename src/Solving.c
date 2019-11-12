@@ -92,6 +92,14 @@ Z3_ast maxOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
 }
 
 
+
+/**
+ * @brief Generates a SAT formula satisfiable if and only the path is valid (IE : an edge exist from 1st node to 2nd node)
+ * @param ctx The solver context
+ * @param graph A graph
+ * @param pathLength The length of the path to check
+ * @return Z3_ast The formula
+ */
 Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
     Z3_ast TabEx[pathLength][orderG(graph)];
     for(int i = 0; i<pathLength ; i++){
@@ -111,11 +119,20 @@ Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
             }
         }
     }
-    Z3_ast ExistPathAST2[pathLength-1][orderG(graph)]
+    Z3_ast ExistPathAST2[pathLength-1][orderG(graph)];
     for(int i = 0; i<pathLength -1; i++){
-        for (int j = 0, j<orderG(graph ; j++)){
-
+        for (int j = 0, j<orderG(graph) ; j++){
+            ExistPathAST2[i][j]=Z3_mk_or(ctx, orderG(graph), ExistPathAST[i][j]);
         }
     }
+
+    Z3_ast ExistPathAST3[pathLength-1];
+    for(int i = 0; i<pathLength -1 ; i++){
+        ExistPathAST3[i] = Z3_mk_and (ctx, pathLength-1, ExistPathAST2[i]);
+    }
+
+    Z3_ast result = Z3_mk_and(ctx, pathLength, ExistPathAST3);
+    return result;
+
 
 }
