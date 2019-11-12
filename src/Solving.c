@@ -99,5 +99,23 @@ Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
             TabEx[i][j] = getNodeVariable(ctx, number, i, pathLength, j);
         }
     }
-    Z_3ast ExistPathAST[pathLength-1][]
 
+    Z3_ast ExistPathAST[pathLength-1][orderG(graph)][orderG(graph)];
+    Z3_ast TabAnd[2];
+    for(int i = 0; i<pathLength-1; i++){
+        for (int j = 0; j<orderG(graph) ; j++){
+            TabAnd[0]=TabEx[i][j]
+            for (int k = 0, k<orderG(graph) ; k++ ){
+                tabAnd[1]=TabEx[i+1][k];
+                ExistPathAST[i][j][k]=Z3_mk_and(ctx, 2, TabAnd);
+            }
+        }
+    }
+    Z3_ast ExistPathAST2[pathLength-1][orderG(graph)]
+    for(int i = 0; i<pathLength -1; i++){
+        for (int j = 0, j<orderG(graph ; j++)){
+
+        }
+    }
+
+}
