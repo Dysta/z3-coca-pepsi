@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
 Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node) {
     int size = 256;
     char buff[size];
@@ -16,7 +15,6 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
     return mk_bool_var(ctx, buff);
 }
 
-// Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength)
 
 /**
  * @brief Generates a SAT formula satisfiable if and only there is at least a vertex at each position
@@ -61,11 +59,11 @@ Z3_ast maxOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
     Z3_ast neg1, neg2;
     Z3_ast TabNot[2];
     for(int i = 0; i<pathLength ; i++){
-        for (int j = 0; j<orderG(graph){
+        for (int j = 0; j<orderG(graph); j++){
             pos = 0;
             neg1 = Z3_mk_not(ctx, TabEx[i][j]);
             TabNot[0] = neg1;
-            for int(k = 0; k<orderG(graph); k++){
+            for (int k = 0; k<orderG(graph); k++){
                 if(k != j){
                     neg2 = Z3_mk_not(ctx, TabEx[i][k]);
                     TabNot[1]=neg2;
@@ -77,13 +75,13 @@ Z3_ast maxOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
     }
     Z3_ast maxAST2[pathLength][orderG(graph)];
     for(int i = 0; i< pathLength; i++){
-        for (int j = 0; j< orderG(graph), j++){
+        for (int j = 0; j< orderG(graph); j++){
             maxAST2[i][j] = Z3_mk_and(ctx, orderG(graph)-1, maxAST[i][j]);
         }
     }
 
     Z3_ast maxAST3[pathLength];
-    for int(i = 0; i<pathLength; i++){
+    for (int i = 0; i<pathLength; i++){
         maxAST3[i]=Z3_mk_and(ctx, pathLength, maxAST2[i]);
     }
 
@@ -112,16 +110,16 @@ Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
     Z3_ast TabAnd[2];
     for(int i = 0; i<pathLength-1; i++){
         for (int j = 0; j<orderG(graph) ; j++){
-            TabAnd[0]=TabEx[i][j]
-            for (int k = 0, k<orderG(graph) ; k++ ){
-                tabAnd[1]=TabEx[i+1][k];
+            TabAnd[0]=TabEx[i][j];
+            for (int k = 0; k<orderG(graph) ; k++ ){
+                TabAnd[1]=TabEx[i+1][k];
                 ExistPathAST[i][j][k]=Z3_mk_and(ctx, 2, TabAnd);
             }
         }
     }
     Z3_ast ExistPathAST2[pathLength-1][orderG(graph)];
     for(int i = 0; i<pathLength -1; i++){
-        for (int j = 0, j<orderG(graph) ; j++){
+        for (int j = 0; j<orderG(graph) ; j++){
             ExistPathAST2[i][j]=Z3_mk_or(ctx, orderG(graph), ExistPathAST[i][j]);
         }
     }
@@ -134,5 +132,99 @@ Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
     Z3_ast result = Z3_mk_and(ctx, pathLength, ExistPathAST3);
     return result;
 
+}
 
+/**
+ * @brief Generates a SAT formula satisfiable if and only the path is simple (IE : a node can only appear once)
+ * @param ctx The solver context
+ * @param graph A graph
+ * @param pathLength The length of the path to check
+ * @return Z3_ast The formula
+ */
+Z3_ast SimplePath(Z3_context ctx, int number, Graph graph, int pathLength){
+    Z3_ast TabEx[orderG(graph)][pathLength];
+    for(int i = 0; i<orderG(graph) ; i++){
+        for (int j=0 ; j<pathLength ; j++){
+            TabEx[i][j] = getNodeVariable(ctx, number, j, pathLength, i);
+        }
+    }
+    Z3_ast SimplePathAST[orderG(graph)][pathLength][pathLength-1];
+    Z3_ast neg1, neg2;
+    Z3_ast negTab[2];
+    int pos = 0;
+
+    for(int i = 0; i<orderG(graph); i++){
+        for (int j = 0 ; j<pathLength ; j++){
+            neg1 = Z3_mk_not(ctx,TabEx[i][j]);
+            negTab[0] = neg1;
+            pos = 0;
+            for (int k = 0 ; k<pathLength-1 ; k++){
+                if (j!=k){
+                    neg2 =  Z3_mk_not(ctx,TabEx[i][k]);
+                    negTab[1] = neg2;
+                    SimplePathAST[i][j][pos]=Z3_mk_or(ctx, 2, negTab);
+                    pos++;
+                }
+            }
+        }
+    }
+
+    Z3_ast SimplePathAST2[orderG(graph)][pathLength];
+
+    for(int i = 0; i<orderG(graph); i++){
+        for (int j = 0; j<pathLength ; j++){
+            SimplePathAST2[i][j] = Z3_mk_and(ctx, pathLength-1,SimplePathAST[i][j]);
+        }
+    }
+    Z3_ast SimplePathAST3[orderG(graph)];
+
+    for (int i = 0; i<orderG(graph); i++){
+        SimplePathAST3[i]=Z3_mk_and(ctx, pathLength, SimplePathAST2[i]);
+    }
+    
+    Z3_ast result = Z3_mk_and(ctx, pathLength, SimplePathAST3);
+    return result;
+
+}
+
+/**
+ * @brief Generates a SAT formula satisfiable if and only the path starts with s and end with t
+ * @param ctx The solver context
+ * @param graph A graph
+ * @param pathLength The length of the path to check
+ * @return Z3_ast The formula
+ */
+Z3_ast sFirsttLast(Z3_context ctx, int number, Graph graph, int pathLength){
+    int s, t;
+    for (int i = 0; i<orderG(graph) ; i++){
+        if (isSource(graph, i))
+            s=i;
+        if (isTarget(graph, i))
+            t=i;
+    }
+    Z3_ast andTab[2];
+    andTab[0] = getNodeVariable(ctx, number, 0, pathLength, s);
+    andTab[1] = getNodeVariable(ctx, number, pathLength-1, pathLength, t);
+
+    Z3_ast result = Z3_mk_and(ctx, 2, andTab);
+    return result;
+}
+
+Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
+    Z3_ast allGraphAllFormulaTab[numGraphs][5];
+    for (int i = 0; i<numGraphs ; i++){
+        allGraphAllFormulaTab[i][0] = existOneVertex(ctx, i, graphs[i], pathLength);
+        allGraphAllFormulaTab[i][1] = maxOneVertex(ctx, i, graphs[i], pathLength);
+        allGraphAllFormulaTab[i][2] = ExistPath(ctx, i, graphs[i], pathLength);
+        allGraphAllFormulaTab[i][4] = SimplePath(ctx, i, graphs[i], pathLength);
+        allGraphAllFormulaTab[i][5] = sFirsttLast(ctx, i, graphs[i], pathLength);
+    }
+
+    Z3_ast allGraphTab[numGraphs];
+    for (int i = 0; i<numGraphs ; i++){
+        allGraphTab[i] = Z3_mk_and(ctx, 5, allGraphAllFormulaTab[i]);
+    }
+
+    Z3_ast result = Z3_mk_and(ctx, numGraphs, allGraphTab);
+    return result;
 }
