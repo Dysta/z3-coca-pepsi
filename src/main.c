@@ -125,6 +125,7 @@ int main(int argc, char* argv[]) {
     g[0]=getGraphFromFile(filename);
     Z3_context ctx = makeContext();
     Z3_ast result = graphsToFullFormula(ctx, g, 1);
+    //Z3_ast result = maxOneVertex(ctx, 1, g[0], 2);
 
     Z3_lbool isSat = isFormulaSat(ctx,result);
 
