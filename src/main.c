@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (optind == argc - 1) // get the filename to open
-        snprintf(filename, 64, "%s", argv[argc-1]);
+        snprintf(filename, 128, "%s", argv[argc-1]);
 
     // check if we correctly get the good arg
     printf("option :\n \
@@ -121,7 +121,28 @@ int main(int argc, char* argv[]) {
             filename
     );
 
-    Graph g = getGraphFromFile(filename);
+    Graph g[1] ;
+    g[0]=getGraphFromFile(filename);
+    Z3_context ctx = makeContext();
+    Z3_ast result = graphsToFullFormula(ctx, g, 1);
+
+    Z3_lbool isSat = isFormulaSat(ctx,result);
+
+            switch (isSat)
+        {
+        case Z3_L_FALSE:
+            printf("%s is not satisfiable.\n",Z3_ast_to_string(ctx,result));
+            break;
+
+        case Z3_L_UNDEF:
+                printf("We don't know if %s is satisfiable.\n",Z3_ast_to_string(ctx,result));
+            break;
+
+        case Z3_L_TRUE:
+                printf("%s is satisfiable.\n",Z3_ast_to_string(ctx,result));
+                Z3_model model = getModelFromSatFormula(ctx,result);
+            break;
+        }
 
     return 0;
 }
