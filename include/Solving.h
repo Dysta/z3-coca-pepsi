@@ -16,6 +16,8 @@
 #include "Graph.h"
 #include <z3.h>
 
+enum mode {INCREASING, DECREASING};
+
 /**
  * @brief choose the order mode to explore length
  */

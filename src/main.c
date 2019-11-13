@@ -39,9 +39,10 @@ int main(int argc, char* argv[]) {
     bool writeColoredDot  = false;
     int exploreLengthMode = INCREASING;
     char outputName[64];
+    char filename[64];
 
     while( (arg = getopt(argc, argv, "hvFsdatfo:")) != -1) {
-        printf("arg : %c ==== optarg : %s\n", arg, optarg);
+        printf("arg : %c ==== optarg : %s ==== optind : %d\n", arg, optarg, optind);
         switch(arg) {
             case 'h':
             {
@@ -90,14 +91,13 @@ int main(int argc, char* argv[]) {
             case 'o':
             {
                 snprintf(outputName, 64, "%s-l%d.dot", optarg, 0);
-                printf("output name : %s\n", outputName);
                 break;
             }
         }
     }
 
-    for (index = optind; index < argc; index++)
-    printf ("Non-option argument %s\n", argv[index]);
+    if (optind == argc - 1) // get the filename to open
+        snprintf(filename, 64, "%s", argv[argc-1]);
 
     // check if we correctly get the good arg
     printf("option :\n \
@@ -108,7 +108,8 @@ int main(int argc, char* argv[]) {
             displayPath    : %d\n \
             writeColoredDot: %d\n \
             exploreLengthMode : %d\n \
-            outputName     : %s\n",
+            outputName     : %s\n \
+            filename       : %s\n",
             verbose,
             displayFormula,
             testSeparately,
@@ -116,10 +117,11 @@ int main(int argc, char* argv[]) {
             displayPath,
             writeColoredDot,
             exploreLengthMode,
-            outputName
+            outputName,
+            filename
     );
 
-    Graph g = getGraphFromFile("test");
+    Graph g = getGraphFromFile(filename);
 
     return 0;
 }
