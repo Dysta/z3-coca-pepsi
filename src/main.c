@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
     bool writeColoredDot  = false;
     int exploreLengthMode = INCREASING;
     char outputName[64];
-    char filename[64];
+    char filename[128];
 
     while( (arg = getopt(argc, argv, "hvFsdatfo:")) != -1) {
         printf("arg : %c ==== optarg : %s ==== optind : %d\n", arg, optarg, optind);

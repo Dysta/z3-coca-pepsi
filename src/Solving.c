@@ -114,6 +114,7 @@ Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
     printf("Tableau ExistPath Crée\n");
     Z3_ast TabAnd[2];
     printf("Tableau TabAnd Crée\n");
+    printf("pathLength %d\n", pathLength-2); // -1
     for(int i = 0; i<pathLength-2; i++){
         printf("a\n");
         for (int j = 0; j<orderG(graph) ; j++){
@@ -126,6 +127,7 @@ Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
             }
         }
     }
+    // segfault ici 
     Z3_ast ExistPathAST2[pathLength-1][orderG(graph)];
     for(int i = 0; i<pathLength -1; i++){
         for (int j = 0; j<orderG(graph) ; j++){
