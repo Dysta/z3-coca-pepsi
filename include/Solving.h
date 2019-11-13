@@ -16,6 +16,8 @@
 #include "Graph.h"
 #include <z3.h>
 
+enum mode {INCREASING, DECREASING};
+
 /**
  * @brief Generates a formula consisting of a variable representing the fact that @p node of graph number @p number is at position @p position of an accepting path.
  * 
