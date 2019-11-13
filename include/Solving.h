@@ -17,6 +17,11 @@
 #include <z3.h>
 
 /**
+ * @brief choose the order mode to explore length
+ */
+enum order {DECREASING, INCREASING};
+
+/**
  * @brief Generates a formula consisting of a variable representing the fact that @p node of graph number @p number is at position @p position of an accepting path.
  * 
  * @param ctx The solver context.
