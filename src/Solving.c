@@ -34,11 +34,12 @@ Z3_ast existOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
     Z3_ast existAST[pathLength+1];
     for(int i = 0; i<=pathLength ; i++){
         for (int j=0 ; j<orderG(graph) ; j++){
-            TabEx[i][j] = getNodeVariable(ctx, number, i, pathLength+1, j);
+            TabEx[i][j] = getNodeVariable(ctx, number, i, pathLength, j);
         }
         existAST[i] = Z3_mk_or(ctx, orderG(graph), TabEx[i]);
     }
     Z3_ast result = Z3_mk_and(ctx, pathLength+1, existAST);
+    printf("\n==========ExistOne============\n%s",Z3_ast_to_string(ctx,result));
     return result;
 }
 
@@ -55,7 +56,7 @@ Z3_ast maxOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
     Z3_ast TabEx[pathLength+1][orderG(graph)];
     for(int i = 0; i<pathLength+1 ; i++){
         for (int j=0 ; j<orderG(graph) ; j++){
-            TabEx[i][j] = getNodeVariable(ctx, number, i, pathLength+1, j);
+            TabEx[i][j] = getNodeVariable(ctx, number, i, pathLength, j);
         }
     }
     Z3_ast maxAST[pathLength+1][orderG(graph)][orderG(graph)-1];
@@ -83,6 +84,7 @@ Z3_ast maxOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
     }
 
     Z3_ast result = Z3_mk_and(ctx, pathLength+1, maxAST3);
+    printf("\n==========MaxOne============\n%s",Z3_ast_to_string(ctx,result));
     return result;
 }
 
@@ -107,27 +109,27 @@ Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
             TabEx[i][j] = getNodeVariable(ctx, number, i, pathLength, j);
         }
     }
-    printf("lol\n");
+    //printf("lol\n");
     Z3_ast ExistPathAST[pathLength+1][orderG(graph)][orderG(graph)];
     Z3_ast TabAnd[2];
     Z3_ast ExistPathAST2[pathLength+1][orderG(graph)];
     Z3_ast ExistPathAST3[pathLength+1];
-    printf("lol2\n");
+    //printf("lol2\n");
     for(int i = 0; i<pathLength; i++){
         //printf("i = %d\n", i);
-        printf("lol3\n");
+      //  printf("lol3\n");
         for (int j = 0; j<orderG(graph) ; j++){
-          printf("lol4\n");
+        //  printf("lol4\n");
             pos = 0;
             TabAnd[0]=TabEx[i][j];
             for (int k = 0; k<orderG(graph) ; k++ ){
             //    printf("k =%d\n", k);
                 if(isEdge(graph, j, k)){
-                    printf("lol5\n");
+          //          printf("lol5\n");
                     TabAnd[1]=TabEx[i+1][k];
-                    printf("lol6\n");
+            //        printf("lol6\n");
                     ExistPathAST[i][j][pos]=Z3_mk_and(ctx, 2, TabAnd);
-                    printf("lol7\n");
+              //      printf("lol7\n");
                     pos++;
                 }
             }
@@ -138,7 +140,7 @@ Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
 
 
     Z3_ast result = Z3_mk_and(ctx, pathLength, ExistPathAST3);
-    //printf("%s is satisfiable.\n",Z3_ast_to_string(ctx,result));
+    printf("\n==========ExistPath============\n%s",Z3_ast_to_string(ctx,result));
     return result;
 
 }
@@ -166,7 +168,7 @@ Z3_ast SimplePath(Z3_context ctx, int number, Graph graph, int pathLength){
         }
     }
 
-    Z3_ast SimplePathAST[orderG(graph)][pathLength+1][pathLength];
+    Z3_ast SimplePathAST[orderG(graph)][pathLength+1][pathLength+1];
     Z3_ast SimplePathAST2[orderG(graph)][pathLength+1];
     Z3_ast SimplePathAST3[orderG(graph)];
     Z3_ast neg1, neg2;
@@ -179,7 +181,7 @@ Z3_ast SimplePath(Z3_context ctx, int number, Graph graph, int pathLength){
             neg1 = Z3_mk_not(ctx,TabEx[i][j]);
             negTab[0] = neg1;
             pos = 0;
-            for (int k = 0 ; k<pathLength ; k++){
+            for (int k = 0 ; k<=pathLength ; k++){
                 if (j!=k){
                     neg2 =  Z3_mk_not(ctx,TabEx[i][k]);
                     negTab[1] = neg2;
@@ -195,6 +197,7 @@ Z3_ast SimplePath(Z3_context ctx, int number, Graph graph, int pathLength){
 
     
     Z3_ast result = Z3_mk_and(ctx, pathLength, SimplePathAST3);
+    printf("\n==========SimplePath============\n%s",Z3_ast_to_string(ctx,result));
     return result;
 
 }
@@ -220,6 +223,7 @@ Z3_ast sFirsttLast(Z3_context ctx, int number, Graph graph, int pathLength){
     andTab[1] = getNodeVariable(ctx, number, pathLength, pathLength, t);
 
     Z3_ast result = Z3_mk_and(ctx, 2, andTab);
+    printf("\n==========FirstLast============\n%s",Z3_ast_to_string(ctx,result));
     //printf("done\n");
     return result;
 }
