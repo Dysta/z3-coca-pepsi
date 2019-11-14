@@ -160,7 +160,7 @@ Z3_ast SimplePath(Z3_context ctx, int number, Graph graph, int pathLength){
     /*if(pathLength<=1){
         return Z3_mk_true(ctx);
     }*/
-    
+ 
     Z3_ast TabEx[orderG(graph)][pathLength+1];
     for(int i = 0; i<orderG(graph) ; i++){
         for (int j=0 ; j<=pathLength ; j++){
@@ -189,14 +189,15 @@ Z3_ast SimplePath(Z3_context ctx, int number, Graph graph, int pathLength){
                     pos++;
                 }
             }
-            SimplePathAST2[i][j]=Z3_mk_and(ctx, pos, SimplePathAST[i][j]);
+            if(pos !=0)
+                SimplePathAST2[i][j]=Z3_mk_and(ctx, pos, SimplePathAST[i][j]);
         }
         SimplePathAST3[i]=Z3_mk_and(ctx, pathLength, SimplePathAST2[i]);
     }
  
 
     
-    Z3_ast result = Z3_mk_and(ctx, pathLength, SimplePathAST3);
+    Z3_ast result = Z3_mk_and(ctx, orderG(graph), SimplePathAST3);
     printf("\n==========SimplePath============\n%s",Z3_ast_to_string(ctx,result));
     return result;
 
