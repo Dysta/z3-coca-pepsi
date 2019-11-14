@@ -27,6 +27,7 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
  * @param graph A graph
  * @param pathLength The length of the path to check
  * @return Z3_ast The formula
+ * FONCTIONNE !
  */
 Z3_ast existOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
     //printf("ExistOneVertex \n");
@@ -50,6 +51,7 @@ Z3_ast existOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
  * @param graph A graph
  * @param pathLength The length of the path to check
  * @return Z3_ast The formula
+ * FONCTIONNE !
  */
 Z3_ast maxOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
     //printf("MaxOneVertex\n");
@@ -96,6 +98,7 @@ Z3_ast maxOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
  * @param graph A graph
  * @param pathLength The length of the path to check
  * @return Z3_ast The formula
+ * BUGGE
  */
 Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
     //printf("ExistPath\n");
@@ -109,27 +112,18 @@ Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
             TabEx[i][j] = getNodeVariable(ctx, number, i, pathLength, j);
         }
     }
-    //printf("lol\n");
     Z3_ast ExistPathAST[pathLength+1][orderG(graph)][orderG(graph)];
     Z3_ast TabAnd[2];
     Z3_ast ExistPathAST2[pathLength+1][orderG(graph)];
     Z3_ast ExistPathAST3[pathLength+1];
-    //printf("lol2\n");
     for(int i = 0; i<pathLength; i++){
-        //printf("i = %d\n", i);
-      //  printf("lol3\n");
         for (int j = 0; j<orderG(graph) ; j++){
-        //  printf("lol4\n");
             pos = 0;
             TabAnd[0]=TabEx[i][j];
             for (int k = 0; k<orderG(graph) ; k++ ){
-            //    printf("k =%d\n", k);
                 if(isEdge(graph, j, k)){
-          //          printf("lol5\n");
                     TabAnd[1]=TabEx[i+1][k];
-            //        printf("lol6\n");
                     ExistPathAST[i][j][pos]=Z3_mk_and(ctx, 2, TabAnd);
-              //      printf("lol7\n");
                     pos++;
                 }
             }
@@ -154,12 +148,10 @@ Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
  * @param graph A graph
  * @param pathLength The length of the path to check
  * @return Z3_ast The formula
+ * FONCTIONNE !
  */
 Z3_ast SimplePath(Z3_context ctx, int number, Graph graph, int pathLength){
-    //printf("SimplePath\n");
-    /*if(pathLength<=1){
-        return Z3_mk_true(ctx);
-    }*/
+
  
     Z3_ast TabEx[orderG(graph)][pathLength+1];
     for(int i = 0; i<orderG(graph) ; i++){
@@ -209,6 +201,7 @@ Z3_ast SimplePath(Z3_context ctx, int number, Graph graph, int pathLength){
  * @param graph A graph
  * @param pathLength The length of the path to check
  * @return Z3_ast The formula
+ * FONCTIONNE !
  */
 Z3_ast sFirsttLast(Z3_context ctx, int number, Graph graph, int pathLength){
     //printf("FirstLast\n");
