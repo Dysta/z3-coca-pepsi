@@ -180,6 +180,8 @@ Z3_ast SimplePath(Z3_context ctx, int number, Graph graph, int pathLength){
     }
 
     Z3_ast SimplePathAST[orderG(graph)][pathLength][pathLength-1];
+    Z3_ast SimplePathAST2[orderG(graph)][pathLength];
+    Z3_ast SimplePathAST3[orderG(graph)];
     Z3_ast neg1, neg2;
     Z3_ast negTab[2];
     int pos = 0;
@@ -195,33 +197,16 @@ Z3_ast SimplePath(Z3_context ctx, int number, Graph graph, int pathLength){
                     neg2 =  Z3_mk_not(ctx,TabEx[i][k]);
                     negTab[1] = neg2;
                     SimplePathAST[i][j][pos]=Z3_mk_or(ctx, 2, negTab);
-                    printf("pos : %d\n", pos);
-                    Z3_ast sat = SimplePathAST[i][j][pos];
-                    Z3_lbool isSat = isFormulaSat(ctx,sat);
-                    switch (isSat){
-                    case Z3_L_FALSE:
-                        printf("%s is not satisfiable.\n",Z3_ast_to_string(ctx,sat));
-                    break;
-                    case Z3_L_UNDEF:
-                        printf("We don't know if %s is satisfiable.\n",Z3_ast_to_string(ctx,sat));
-                    break;
-                    case Z3_L_TRUE:
-                        printf("%s is satisfiable.\n",Z3_ast_to_string(ctx,sat));
-                        Z3_model model = getModelFromSatFormula(ctx,sat);
-                    break;
-
-                    }
-                    printf("==============\n");
-
                     pos++;
                 }
             }
+            SimplePathAST2[i][j]=Z3_mk_and(ctx, pos, SimplePathAST[i][j]);
         }
+        SimplePathAST3[i]=Z3_mk_and(ctx, pathLength, SimplePathAST2[i]);
     }
-    printf("sorti youou\n");
+ 
 
-    Z3_ast SimplePathAST2[orderG(graph)][pathLength];
-    printf("order : %d pathL : %d \n",orderG(graph), pathLength);
+   /* printf("order : %d pathL : %d \n",orderG(graph), pathLength);
     
     for(int i = 0; i<orderG(graph); i++){
         printf("i: %d\n" , i);
@@ -235,11 +220,10 @@ Z3_ast SimplePath(Z3_context ctx, int number, Graph graph, int pathLength){
     }
     printf("sorti 2 youou\n");
 
-    Z3_ast SimplePathAST3[orderG(graph)];
 
     for (int i = 0; i<orderG(graph); i++){
         SimplePathAST3[i]=Z3_mk_and(ctx, pathLength, SimplePathAST2[i]);
-    }
+    }*/
     
     Z3_ast result = Z3_mk_and(ctx, pathLength, SimplePathAST3);
     return result;
