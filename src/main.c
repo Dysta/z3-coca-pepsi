@@ -8,6 +8,8 @@
 #include "Z3Tools.h"
 #include "Solving.h"
 
+enum mode {INCREASING, DECREASING};
+
 void usage(const char* progName) {
     printf("Use: %s [options] files... \n \
 Each file should contain a graph in dot format. \n \
@@ -126,13 +128,15 @@ int main(int argc, char* argv[]) {
     Z3_context ctx = makeContext();
     Z3_ast result = graphsToFullFormula(ctx, g, 1);
     //Z3_ast result = maxOneVertex(ctx, 1, g[0], 2);
-
+    int order = orderG(g[0]);
+    int size = sizeG(g[0]);
+    printf("order  : %d\n size : %d\n", order, size);
     Z3_lbool isSat = isFormulaSat(ctx,result);
 
             switch (isSat)
         {
         case Z3_L_FALSE:
-            printf("%s is not satisfiable.\n",Z3_ast_to_string(ctx,result));
+            printf("is not satisfiable.\n");//,Z3_ast_to_string(ctx,result));
             break;
 
         case Z3_L_UNDEF:
@@ -140,7 +144,7 @@ int main(int argc, char* argv[]) {
             break;
 
         case Z3_L_TRUE:
-                printf("%s is satisfiable.\n",Z3_ast_to_string(ctx,result));
+                printf("is satisfiable.\n");//,Z3_ast_to_string(ctx,result));
                 Z3_model model = getModelFromSatFormula(ctx,result);
             break;
         }

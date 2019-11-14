@@ -3,6 +3,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/**
+ * @brief choose the order mode to explore length
+ */
+
+
 Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node) {
     int size = 256;
     char buff[size];
@@ -24,7 +29,7 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
  * @return Z3_ast The formula
  */
 Z3_ast existOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
-    printf("ExistOneVertex \n");
+    //printf("ExistOneVertex \n");
     Z3_ast TabEx[pathLength][orderG(graph)];
     for(int i = 0; i<pathLength ; i++){
         for (int j=0 ; j<orderG(graph) ; j++){
@@ -48,7 +53,7 @@ Z3_ast existOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
  * @return Z3_ast The formula
  */
 Z3_ast maxOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
-    printf("MaxOneVertex\n");
+    //printf("MaxOneVertex\n");
     Z3_ast TabEx[pathLength][orderG(graph)];
     for(int i = 0; i<pathLength ; i++){
         for (int j=0 ; j<orderG(graph) ; j++){
@@ -100,53 +105,55 @@ Z3_ast maxOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
  * @param pathLength The length of the path to check
  * @return Z3_ast The formula
  */
-/*Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
-    printf("ExistPath\n");
+Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
+    //printf("ExistPath\n");
+    /*if(pathLength<=1){
+        return Z3_mk_true(ctx);
+    }*/
+    int pos;
     Z3_ast TabEx[pathLength][orderG(graph)];
     for(int i = 0; i<pathLength ; i++){
         for (int j=0 ; j<orderG(graph) ; j++){
             TabEx[i][j] = getNodeVariable(ctx, number, i, pathLength, j);
         }
     }
-    printf("Tableau Crée\n");
     
     Z3_ast ExistPathAST[pathLength-1][orderG(graph)][orderG(graph)];
-    printf("Tableau ExistPath Crée\n");
     Z3_ast TabAnd[2];
-    printf("Tableau TabAnd Crée\n");
-    printf("pathLength %d\n", pathLength-1); // -1
-    if(pathLength<=1){
-        return Z3_mk_true(ctx);
-    }
+    Z3_ast ExistPathAST2[pathLength-1][orderG(graph)];
+    Z3_ast ExistPathAST3[pathLength-1];
     for(int i = 0; i<pathLength-1; i++){
-        //printf("a\n");
+        //printf("i = %d\n", i);
         for (int j = 0; j<orderG(graph) ; j++){
-          //  printf("b\n");
+          // printf("j =%d\n", j);
+            pos = 0;
             TabAnd[0]=TabEx[i][j];
             for (int k = 0; k<orderG(graph) ; k++ ){
-            //    printf("c\n");
-                TabAnd[1]=TabEx[i+1][k];
-                ExistPathAST[i][j][k]=Z3_mk_and(ctx, 2, TabAnd);
+            //    printf("k =%d\n", k);
+                if(isEdge(graph, j, k)){
+                    TabAnd[1]=TabEx[i+1][k];
+                    ExistPathAST[i][j][pos]=Z3_mk_and(ctx, 2, TabAnd);
+                    pos++;
+                }
             }
+            ExistPathAST2[i][j]=Z3_mk_or(ctx, pos, ExistPathAST[i][j]);
         }
+        ExistPathAST3[i] = Z3_mk_and(ctx, orderG(graph), ExistPathAST2[i]);
     }
     // segfault ici 
-    Z3_ast ExistPathAST2[pathLength-1][orderG(graph)];
-    for(int i = 0; i<pathLength -1; i++){
+    /*for(int i = 0; i<pathLength -1; i++){
         for (int j = 0; j<orderG(graph) ; j++){
             ExistPathAST2[i][j]=Z3_mk_or(ctx, orderG(graph), ExistPathAST[i][j]);
         }
     }
 
-    Z3_ast ExistPathAST3[pathLength-1];
     for(int i = 0; i<pathLength -1 ; i++){
-        ExistPathAST3[i] = Z3_mk_and (ctx, pathLength-1, ExistPathAST2[i]);
-    }
+    }*/
 
-    Z3_ast result = Z3_mk_and(ctx, pathLength, ExistPathAST3);
+    Z3_ast result = Z3_mk_and(ctx, pathLength-1, ExistPathAST3);
     return result;
 
-}*/
+}
 
 /*Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
     Z3_ast TabEx[pathLength][orderG(graph)];
@@ -167,10 +174,10 @@ Z3_ast maxOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
  * @return Z3_ast The formula
  */
 Z3_ast SimplePath(Z3_context ctx, int number, Graph graph, int pathLength){
-    printf("SimplePath\n");
-    if(pathLength<=1){
+    //printf("SimplePath\n");
+    /*if(pathLength<=1){
         return Z3_mk_true(ctx);
-    }
+    }*/
     
     Z3_ast TabEx[orderG(graph)][pathLength];
     for(int i = 0; i<orderG(graph) ; i++){
@@ -238,7 +245,7 @@ Z3_ast SimplePath(Z3_context ctx, int number, Graph graph, int pathLength){
  * @return Z3_ast The formula
  */
 Z3_ast sFirsttLast(Z3_context ctx, int number, Graph graph, int pathLength){
-    printf("FirstLast\n");
+    //printf("FirstLast\n");
     int s, t;
     for (int i = 0; i<orderG(graph) ; i++){
         if (isSource(graph, i))
@@ -251,7 +258,7 @@ Z3_ast sFirsttLast(Z3_context ctx, int number, Graph graph, int pathLength){
     andTab[1] = getNodeVariable(ctx, number, pathLength-1, pathLength, t);
 
     Z3_ast result = Z3_mk_and(ctx, 2, andTab);
-    printf("done\n");
+    //printf("done\n");
     return result;
 }
 
@@ -260,21 +267,21 @@ Z3_ast sFirsttLast(Z3_context ctx, int number, Graph graph, int pathLength){
  * 
  ******/
 Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs, int pathLength){
-    Z3_ast allGraphAllFormulaTab[numGraphs][1];
-    printf("on entre dans la boucle\n");
+    Z3_ast allGraphAllFormulaTab[numGraphs][4];
+    //printf("on entre dans la boucle\n");
     for (int i = 0; i<numGraphs ; i++){
-        printf("Graph nb : %d \n", i);
-        //allGraphAllFormulaTab[i][0] = existOneVertex(ctx, i, graphs[i], pathLength);
-        //allGraphAllFormulaTab[i][0] = maxOneVertex(ctx, i, graphs[i], pathLength);
-        //allGraphAllFormulaTab[i][2] = ExistPath(ctx, i, graphs[i], pathLength); SEGFAULT
-        allGraphAllFormulaTab[i][0] = SimplePath(ctx, i, graphs[i], pathLength); //SEGFAULT
-        //allGraphAllFormulaTab[i][0] = sFirsttLast(ctx, i, graphs[i], pathLength);
+        //printf("Graph nb : %d \n", i);
+        allGraphAllFormulaTab[i][0] = existOneVertex(ctx, i, graphs[i], pathLength);
+        allGraphAllFormulaTab[i][1] = maxOneVertex(ctx, i, graphs[i], pathLength);
+        allGraphAllFormulaTab[i][2] = ExistPath(ctx, i, graphs[i], pathLength); //SEGFAULT
+        allGraphAllFormulaTab[i][3] = SimplePath(ctx, i, graphs[i], pathLength); //SEGFAULT
+        allGraphAllFormulaTab[i][4] = sFirsttLast(ctx, i, graphs[i], pathLength);
     }
 
     Z3_ast allGraphTab[numGraphs];
     for (int i = 0; i<numGraphs ; i++){
-        printf("2eme boucle\n");
-        allGraphTab[i] = Z3_mk_and(ctx, 1, allGraphAllFormulaTab[i]);
+        allGraphTab[i] = Z3_mk_and(ctx, 4, allGraphAllFormulaTab[i]);
+
     }
 
     Z3_ast result = Z3_mk_and(ctx, numGraphs, allGraphTab);
@@ -294,11 +301,28 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
     }
 
     Z3_ast FormulaOfI[maxLength];
-    for (int i=1 ; i<=maxLength ; i++){
-        printf("i = %d\n", i);
-        FormulaOfI[i-1]=graphsToPathFormula(ctx, graphs, numGraphs, i);
+    for (int i=2 ; i<=maxLength ; i++){
+       // printf("i = %d\n", i);
+        FormulaOfI[i-2]=graphsToPathFormula(ctx, graphs, numGraphs, i);
+        Z3_ast result = FormulaOfI[i-2];
+        Z3_lbool isSat = isFormulaSat(ctx,result);
+         switch (isSat)
+        {
+        case Z3_L_FALSE:
+            printf("is not satisfiable.\n");//,Z3_ast_to_string(ctx,result));
+            break;
+
+        case Z3_L_UNDEF:
+                printf("We don't know if %s is satisfiable.\n",Z3_ast_to_string(ctx,result));
+            break;
+
+        case Z3_L_TRUE:
+                printf("is satisfiable.\n");//,Z3_ast_to_string(ctx,result));
+                Z3_model model = getModelFromSatFormula(ctx,result);
+            break;
+        }
     }
     
-    Z3_ast FullFormula = Z3_mk_or(ctx, maxLength, FormulaOfI);
+    Z3_ast FullFormula = Z3_mk_or(ctx, maxLength-1, FormulaOfI);
     return FullFormula;
 }
