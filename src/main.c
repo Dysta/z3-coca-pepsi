@@ -122,32 +122,42 @@ int main(int argc, char* argv[]) {
             outputName,
             filename
     );
-
+    int nbGraph=1; // a modifier avec le nombre de graph recup
     Graph g[1] ;
     g[0]=getGraphFromFile(filename);
     Z3_context ctx = makeContext();
-    Z3_ast result = graphsToFullFormula(ctx, g, 1);
-    //Z3_ast result = maxOneVertex(ctx, 1, g[0], 2);
+    Z3_ast result = graphsToFullFormula(ctx, g, nbGraph);
     int order = orderG(g[0]);
     int size = sizeG(g[0]);
-    printf("order  : %d\n size : %d\n", order, size);
+    
     Z3_lbool isSat = isFormulaSat(ctx,result);
 
-            switch (isSat)
-        {
+    if (verbose){
+        for (int i = 0; i<nbGraph ; i++){
+            printf("Graph number %d : \n", i+1);
+            printGraph(g[i]);
+        }
+    }
+    if (displayFormula)
+        printf("=============\nThe full formula is : \n%s\n",Z3_ast_to_string(ctx,result));
+
+    switch (isSat){
         case Z3_L_FALSE:
-            printf("is not satisfiable.\n");//,Z3_ast_to_string(ctx,result));
+            printf("NON\n");
             break;
 
         case Z3_L_UNDEF:
-                printf("We don't know if %s is satisfiable.\n",Z3_ast_to_string(ctx,result));
+                printf("JSP dsl\n",Z3_ast_to_string(ctx,result));
             break;
 
         case Z3_L_TRUE:
-                printf("is satisfiable.\n");//,Z3_ast_to_string(ctx,result));
-                Z3_model model = getModelFromSatFormula(ctx,result);
+            //Z3_model model = getModelFromSatFormula(ctx,result);
+            printf("OUI\n");
+                
             break;
-        }
+    }
 
+
+    Z3_del_context(ctx);
     return 0;
 }

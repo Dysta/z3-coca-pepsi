@@ -40,7 +40,7 @@ Z3_ast existOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
         existAST[i] = Z3_mk_or(ctx, orderG(graph), TabEx[i]);
     }
     Z3_ast result = Z3_mk_and(ctx, pathLength+1, existAST);
-    printf("\n==========ExistOne============\n%s",Z3_ast_to_string(ctx,result));
+    //printf("\n==========ExistOne============\n%s",Z3_ast_to_string(ctx,result));
     return result;
 }
 
@@ -86,7 +86,7 @@ Z3_ast maxOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
     }
 
     Z3_ast result = Z3_mk_and(ctx, pathLength+1, maxAST3);
-    printf("\n==========MaxOne============\n%s",Z3_ast_to_string(ctx,result));
+    //printf("\n==========MaxOne============\n%s",Z3_ast_to_string(ctx,result));
     return result;
 }
 
@@ -143,7 +143,7 @@ Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
 
 
     Z3_ast result = Z3_mk_and(ctx, pathLength, ExistPathAST3);
-    printf("\n==========ExistPath============\n%s",Z3_ast_to_string(ctx,result));
+    //printf("\n==========ExistPath============\n%s",Z3_ast_to_string(ctx,result));
     return result;
 
 }
@@ -199,7 +199,7 @@ Z3_ast SimplePath(Z3_context ctx, int number, Graph graph, int pathLength){
 
     
     Z3_ast result = Z3_mk_and(ctx, orderG(graph), SimplePathAST3);
-    printf("\n==========SimplePath============\n%s",Z3_ast_to_string(ctx,result));
+    //printf("\n==========SimplePath============\n%s",Z3_ast_to_string(ctx,result));
     return result;
 
 }
@@ -226,8 +226,7 @@ Z3_ast sFirsttLast(Z3_context ctx, int number, Graph graph, int pathLength){
     andTab[1] = getNodeVariable(ctx, number, pathLength, pathLength, t);
 
     Z3_ast result = Z3_mk_and(ctx, 2, andTab);
-    printf("\n==========FirstLast============\n%s",Z3_ast_to_string(ctx,result));
-    //printf("done\n");
+    //printf("\n==========FirstLast============\n%s",Z3_ast_to_string(ctx,result));
     return result;
 }
 
@@ -242,9 +241,9 @@ Z3_ast graphsToPathFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
         //printf("Graph nb : %d \n", i);
         allGraphAllFormulaTab[i][0] = existOneVertex(ctx, i, graphs[i], pathLength);
         allGraphAllFormulaTab[i][1] = maxOneVertex(ctx, i, graphs[i], pathLength);
-        allGraphAllFormulaTab[i][4] = ExistPath(ctx, i, graphs[i], pathLength); 
-        allGraphAllFormulaTab[i][2] = SimplePath(ctx, i, graphs[i], pathLength); 
-        allGraphAllFormulaTab[i][3] = sFirsttLast(ctx, i, graphs[i], pathLength);
+        allGraphAllFormulaTab[i][2] = ExistPath(ctx, i, graphs[i], pathLength); 
+        allGraphAllFormulaTab[i][3] = SimplePath(ctx, i, graphs[i], pathLength); 
+        allGraphAllFormulaTab[i][4] = sFirsttLast(ctx, i, graphs[i], pathLength);
     }
 
     Z3_ast allGraphTab[numGraphs];
