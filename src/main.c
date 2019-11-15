@@ -98,8 +98,14 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (optind == argc - 1) // get the filename to open
-        snprintf(filename, 128, "%s", argv[argc-1]);
+    char* filesname[optind - argc];
+    for (int i = optind; i < argc; i++) 
+        filesname[i - optind] = argv[i];
+    
+    for(int i = 0; i < argc - optind; i++)
+        printf("file %d to open %s\n", i, filesname[i]);
+    // if (optind == argc - 1) // get the filename to open
+    //     snprintf(filename, 128, "%s", argv[argc-1]);
 
     // check if we correctly get the good arg
     printf("option :\n \
@@ -122,9 +128,10 @@ int main(int argc, char* argv[]) {
             outputName,
             filename
     );
-    int nbGraph=1; // a modifier avec le nombre de graph recup
-    Graph g[1] ;
-    g[0]=getGraphFromFile(filename);
+    int nbGraph= argc-optind; // a modifier avec le nombre de graph recup
+    Graph g[nbGraph] ;
+    for(int i = 0; i < argc - optind; i++)
+        g[i]=getGraphFromFile(filesname[i]);
     Z3_context ctx = makeContext();
     Z3_ast result = graphsToFullFormula(ctx, g, nbGraph);
     int order = orderG(g[0]);
@@ -151,8 +158,10 @@ int main(int argc, char* argv[]) {
             break;
 
         case Z3_L_TRUE:
-            //Z3_model model = getModelFromSatFormula(ctx,result);
+            Z3_model model = getModelFromSatFormula(ctx,result);
             printf("OUI\n");
+            printf(" %d\n",valueOfVarInModel(ctx, model,result));
+            printPathsFromModel(ctx, model, g, nbGraph, 3);
                 
             break;
     }

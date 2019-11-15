@@ -270,27 +270,25 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
 
     Z3_ast FormulaOfI[maxLength];
     for (int i=1 ; i<maxLength ; i++){
-       // printf("i = %d\n", i);
         FormulaOfI[i-1]=graphsToPathFormula(ctx, graphs, numGraphs, i);
-        /*Z3_ast result = FormulaOfI[i-1];
-        Z3_lbool isSat = isFormulaSat(ctx,result);
-         switch (isSat)
-        {
-        case Z3_L_FALSE:
-                printf("is not satisfiable.\n");//,Z3_ast_to_string(ctx,result));
-            break;
-
-        case Z3_L_UNDEF:
-                printf("We don't know if %s is satisfiable.\n",Z3_ast_to_string(ctx,result));
-            break;
-
-        case Z3_L_TRUE:
-                //printf("%s is satisfiable.\n",Z3_ast_to_string(ctx,result));
-                Z3_model model = getModelFromSatFormula(ctx,result);
-            break;
-        }*/
     }
     
     Z3_ast FullFormula = Z3_mk_or(ctx, maxLength-1, FormulaOfI);
     return FullFormula;
+}
+
+void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGraph, int pathLength){
+    for (int i = 0 ; i<numGraph ; i++){
+        printf("Graph number %d path :  ", i+1);
+        for (int j=0; j<=pathLength; j++){
+            for (int k = 0; k<orderG(graphs[i]); k++){
+                if (valueOfVarInModel(ctx, model, getNodeVariable(ctx, i, j, pathLength, k))){
+                    if(isTarget(graphs[i], k))
+                        printf("%s\n", getNodeName(graphs[i], k));
+                    else
+                    printf("%s -> ", getNodeName(graphs[i], k));
+                }
+            }
+        }
+    }
 }
