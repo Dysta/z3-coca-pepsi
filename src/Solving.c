@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
 extern bool increasing;
 extern bool computeResult;
 /**
@@ -274,18 +275,21 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
     if (increasing){
         for (int i=1 ; i<maxLength ; i++){
             FormulaOfI[i-1]=graphsToPathFormula(ctx, graphs, numGraphs, i);
-            if (computeResult){
+            if (!computeResult){
                 if (isFormulaSat(ctx,FormulaOfI[i-1])==Z3_L_TRUE)
                     return FormulaOfI[i-1];
+                printf("No simple valid path of length %d\n", i);
+                
             }
         }
     }
     else{
         for (int i=maxLength ; i>1 ; i--){
             FormulaOfI[maxLength-i]=graphsToPathFormula(ctx, graphs, numGraphs, i);
-            if (computeResult){
+            if (!computeResult){
                 if (isFormulaSat(ctx,FormulaOfI[maxLength-i])==Z3_L_TRUE)
                     return FormulaOfI[maxLength-i];
+                printf("No simple valid path of length %d\n", i);
             }
         }
     }

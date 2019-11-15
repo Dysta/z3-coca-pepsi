@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    char* filesname[optind - argc];
+    char* filesname[argc-optind];
     for (int i = optind; i < argc; i++) 
         filesname[i - optind] = argv[i];
     
@@ -129,6 +129,7 @@ int main(int argc, char* argv[]) {
     Graph g[nbGraph] ;
     for(int i = 0; i < argc - optind; i++)
         g[i]=getGraphFromFile(filesname[i]);
+
     Z3_context ctx = makeContext();
     Z3_ast result = graphsToFullFormula(ctx, g, nbGraph);
     int order = orderG(g[0]);
@@ -157,11 +158,11 @@ int main(int argc, char* argv[]) {
 
         case Z3_L_TRUE:
             Z3_model model = getModelFromSatFormula(ctx,result);
-            printf("OUI\n");
             if(displayPath){
                 taille = getSolutionLengthFromModel(ctx, model, g);
             printPathsFromModel(ctx, model, g, nbGraph, taille);
             }
+            printf("OUI\n");
             break;
     }
 
