@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+extern bool increasing;
+extern bool computeResult;
 /**
  * @brief choose the order mode to explore length
  */
@@ -129,14 +131,14 @@ Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
                     pos++;
                 }
             }
-            if (pos>=1){
+            if (pos>1){
                 ExistPathAST2[i][pos2]=Z3_mk_and(ctx, pos, ExistPathAST[i][j]);
                 pos2++;
             }
-            /*if (pos==1){
+            if (pos==1){
                 ExistPathAST2[i][pos2]=ExistPathAST[i][j][0];
                 pos2++;
-            }*/
+            }
         }
         ExistPathAST3[i] = Z3_mk_and(ctx, pos2, ExistPathAST2[i]);
     }
@@ -269,13 +271,43 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
     }
 
     Z3_ast FormulaOfI[maxLength];
-    for (int i=1 ; i<maxLength ; i++){
-        FormulaOfI[i-1]=graphsToPathFormula(ctx, graphs, numGraphs, i);
+    if (increasing){
+        for (int i=1 ; i<maxLength ; i++){
+            FormulaOfI[i-1]=graphsToPathFormula(ctx, graphs, numGraphs, i);
+            if (computeResult){
+                if (isFormulaSat(ctx,FormulaOfI[i-1])==Z3_L_TRUE)
+                    return FormulaOfI[i-1];
+            }
+        }
+    }
+    else{
+        for (int i=maxLength ; i>1 ; i--){
+            FormulaOfI[maxLength-i]=graphsToPathFormula(ctx, graphs, numGraphs, i);
+            if (computeResult){
+                if (isFormulaSat(ctx,FormulaOfI[maxLength-i])==Z3_L_TRUE)
+                    return FormulaOfI[maxLength-i];
+            }
+        }
     }
     
     Z3_ast FullFormula = Z3_mk_or(ctx, maxLength-1, FormulaOfI);
     return FullFormula;
 }
+
+int getSolutionLengthFromModel(Z3_context ctx, Z3_model model, Graph *graphs){
+    for (int i = 0 ; i<orderG(graphs[0]) ; i++){
+        if (isTarget(graphs[0], i)){
+            for (int j = 0; j<orderG(graphs[0]) ;j++){
+                if (valueOfVarInModel(ctx, model,getNodeVariable(ctx,0,j,j,i))){
+                    return j;
+                }
+            }
+        }
+    } 
+    
+    return 0;
+}
+
 
 void printPathsFromModel(Z3_context ctx, Z3_model model, Graph *graphs, int numGraph, int pathLength){
     for (int i = 0 ; i<numGraph ; i++){

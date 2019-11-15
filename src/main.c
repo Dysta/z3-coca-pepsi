@@ -8,7 +8,8 @@
 #include "Z3Tools.h"
 #include "Solving.h"
 
-enum mode {INCREASING, DECREASING};
+bool increasing = true;
+bool computeResult = false;
 
 void usage(const char* progName) {
     printf("Use: %s [options] files... \n \
@@ -33,13 +34,12 @@ int main(int argc, char* argv[]) {
     if (argc == 1) usage(argv[0]);
     int arg;
 
-    bool verbose          = false;
-    bool displayFormula   = false;
-    bool testSeparately   = false;
-    bool computeResult    = false;
-    bool displayPath      = false;
+    bool verbose          = false; //fait
+    bool displayFormula   = false; //fait
+    bool testSeparately   = false; // 
+    bool displayPath      = false; //fait
     bool writeColoredDot  = false;
-    int exploreLengthMode = INCREASING;
+    bool exploreLengthMode = increasing;
     char outputName[64];
     char filename[128];
 
@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
             case 'd':
             {
                 if (testSeparately)
-                    exploreLengthMode = DECREASING;
+                    increasing = false;
                 break;
             }
             case 'a':
@@ -116,8 +116,7 @@ int main(int argc, char* argv[]) {
             displayPath    : %d\n \
             writeColoredDot: %d\n \
             exploreLengthMode : %d\n \
-            outputName     : %s\n \
-            filename       : %s\n",
+            outputName     : %s\n ",
             verbose,
             displayFormula,
             testSeparately,
@@ -125,9 +124,7 @@ int main(int argc, char* argv[]) {
             displayPath,
             writeColoredDot,
             exploreLengthMode,
-            outputName,
-            filename
-    );
+            outputName);
     int nbGraph= argc-optind; // a modifier avec le nombre de graph recup
     Graph g[nbGraph] ;
     for(int i = 0; i < argc - optind; i++)
@@ -136,6 +133,7 @@ int main(int argc, char* argv[]) {
     Z3_ast result = graphsToFullFormula(ctx, g, nbGraph);
     int order = orderG(g[0]);
     int size = sizeG(g[0]);
+    int taille;
     
     Z3_lbool isSat = isFormulaSat(ctx,result);
 
@@ -160,9 +158,10 @@ int main(int argc, char* argv[]) {
         case Z3_L_TRUE:
             Z3_model model = getModelFromSatFormula(ctx,result);
             printf("OUI\n");
-            printf(" %d\n",valueOfVarInModel(ctx, model,result));
-            printPathsFromModel(ctx, model, g, nbGraph, 3);
-                
+            if(displayPath){
+                taille = getSolutionLengthFromModel(ctx, model, g);
+            printPathsFromModel(ctx, model, g, nbGraph, taille);
+            }
             break;
     }
 
