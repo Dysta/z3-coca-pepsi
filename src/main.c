@@ -1,3 +1,15 @@
+/**
+ * @file main.c
+ * @author Thimotée BROCARD
+ * @author Xavier GERARDIN
+ * @brief An implementation of the Coca project
+ * @version 1
+ * @date 2019-11-15
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>

@@ -1,3 +1,15 @@
+/**
+ * @file Solving.c
+ * @author Thimotée BROCARD
+ * @author Xavier GERARDIN
+ * @brief An implementation of the Coca project
+ * @version 1
+ * @date 2019-11-15
+ * 
+ * @copyright Copyright (c) 2019
+ * 
+ */
+
 #include "Solving.h"
 #include "Z3Tools.h"
 #include <stdlib.h>
@@ -208,7 +220,6 @@ Z3_ast SimplePath(Z3_context ctx, int number, Graph graph, int pathLength){
  * FONCTIONNE !
  */
 Z3_ast sFirsttLast(Z3_context ctx, int number, Graph graph, int pathLength){
-    //printf("FirstLast\n");
     int s, t;
     for (int i = 0; i<orderG(graph) ; i++){
         if (isSource(graph, i))
