@@ -6,9 +6,7 @@
 
 extern bool increasing;
 extern bool computeResult;
-/**
- * @brief choose the order mode to explore length
- */
+extern bool testSeparately;
 
 
 Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node) {
@@ -33,7 +31,6 @@ Z3_ast getNodeVariable(Z3_context ctx, int number, int position, int k, int node
  * FONCTIONNE !
  */
 Z3_ast existOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
-    //printf("ExistOneVertex \n");
     Z3_ast TabEx[pathLength+1][orderG(graph)];
     Z3_ast existAST[pathLength+1];
     for(int i = 0; i<=pathLength ; i++){
@@ -57,7 +54,6 @@ Z3_ast existOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
  * FONCTIONNE !
  */
 Z3_ast maxOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
-    //printf("MaxOneVertex\n");
     Z3_ast TabEx[pathLength+1][orderG(graph)];
     for(int i = 0; i<pathLength+1 ; i++){
         for (int j=0 ; j<orderG(graph) ; j++){
@@ -101,13 +97,9 @@ Z3_ast maxOneVertex(Z3_context ctx, int number, Graph graph, int pathLength){
  * @param graph A graph
  * @param pathLength The length of the path to check
  * @return Z3_ast The formula
- * FONCTIONNE
+ * FONCTIONNE !
  */
 Z3_ast ExistPath(Z3_context ctx, int number, Graph graph, int pathLength){
-    //printf("ExistPath\n");
-    /*if(pathLength<=1){
-        return Z3_mk_true(ctx);
-    }*/
     Z3_ast TabEx[pathLength+1][orderG(graph)];
     for(int i = 0; i<pathLength+1 ; i++){
         for (int j=0 ; j<orderG(graph) ; j++){
@@ -272,27 +264,42 @@ Z3_ast graphsToFullFormula( Z3_context ctx, Graph *graphs,unsigned int numGraphs
     }
 
     Z3_ast FormulaOfI[maxLength];
-    if (increasing){
-        for (int i=1 ; i<maxLength ; i++){
-            FormulaOfI[i-1]=graphsToPathFormula(ctx, graphs, numGraphs, i);
-            if (!computeResult){
-                if (isFormulaSat(ctx,FormulaOfI[i-1])==Z3_L_TRUE)
-                    return FormulaOfI[i-1];
-                printf("No simple valid path of length %d\n", i);
-                
+
+    if(testSeparately){
+        if (increasing){
+            for (int i=1 ; i<=maxLength ; i++){
+                FormulaOfI[i-1]=graphsToPathFormula(ctx, graphs, numGraphs, i);
+                if (isFormulaSat(ctx,FormulaOfI[i-1])==Z3_L_TRUE){
+                    printf("Simple valid path of length %d\n", i);
+                    if (!computeResult)
+                        return FormulaOfI[i-1];
+                }
+                else
+                    printf("No simple valid path of length %d\n", i);
+
+            }
+        }
+        else{
+            for (int i=maxLength ; i>=1 ; i--){
+                FormulaOfI[maxLength-i]=graphsToPathFormula(ctx, graphs, numGraphs, i);
+                if (isFormulaSat(ctx,FormulaOfI[maxLength-i])==Z3_L_TRUE){
+                    printf("Simple valid path of length %d\n", i);
+                    if (!computeResult){
+                        return FormulaOfI[maxLength-i];
+                }
+                }
+                else
+                    printf("No simple valid path of length %d\n", i);
+
             }
         }
     }
+
     else{
-        for (int i=maxLength ; i>1 ; i--){
-            FormulaOfI[maxLength-i]=graphsToPathFormula(ctx, graphs, numGraphs, i);
-            if (!computeResult){
-                if (isFormulaSat(ctx,FormulaOfI[maxLength-i])==Z3_L_TRUE)
-                    return FormulaOfI[maxLength-i];
-                printf("No simple valid path of length %d\n", i);
-            }
-        }
+        for (int i=1 ; i<=maxLength ; i++)
+            FormulaOfI[i-1]=graphsToPathFormula(ctx, graphs, numGraphs, i);
     }
+    
     
     Z3_ast FullFormula = Z3_mk_or(ctx, maxLength-1, FormulaOfI);
     return FullFormula;

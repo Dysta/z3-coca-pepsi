@@ -10,6 +10,7 @@
 
 bool increasing = true;
 bool computeResult = false;
+bool testSeparately = false;
 
 void usage(const char* progName) {
     printf("Use: %s [options] files... \n \
@@ -36,7 +37,6 @@ int main(int argc, char* argv[]) {
 
     bool verbose          = false; //fait
     bool displayFormula   = false; //fait
-    bool testSeparately   = false; // 
     bool displayPath      = false; //fait
     bool writeColoredDot  = false;
     bool exploreLengthMode = increasing;
@@ -63,9 +63,9 @@ int main(int argc, char* argv[]) {
             }
             case 's':
             {
-                // on test séparément les différentes formule, jsp ce que c'est mais c la 
                 printf("Utilisation arg -s\n");
                 testSeparately = true;
+
                 break;
             }
             case 'd':
@@ -104,11 +104,8 @@ int main(int argc, char* argv[]) {
     
     for(int i = 0; i < argc - optind; i++)
         printf("file %d to open %s\n", i, filesname[i]);
-    // if (optind == argc - 1) // get the filename to open
-    //     snprintf(filename, 128, "%s", argv[argc-1]);
 
-    // check if we correctly get the good arg
-    printf("option :\n \
+   /* printf("option :\n \
             verbose : %d\n \
             displayFormula : %d\n \
             testSeparately : %d\n \
@@ -116,7 +113,7 @@ int main(int argc, char* argv[]) {
             displayPath    : %d\n \
             writeColoredDot: %d\n \
             exploreLengthMode : %d\n \
-            outputName     : %s\n ",
+            outputName     : %s\n",
             verbose,
             displayFormula,
             testSeparately,
@@ -124,10 +121,11 @@ int main(int argc, char* argv[]) {
             displayPath,
             writeColoredDot,
             exploreLengthMode,
-            outputName);
-    int nbGraph= argc-optind; // a modifier avec le nombre de graph recup
+            outputName); //Display some information to debug*/
+
+    int nbGraph= argc-optind;
     Graph g[nbGraph] ;
-    for(int i = 0; i < argc - optind; i++)
+    for(int i = 0; i < nbGraph; i++)
         g[i]=getGraphFromFile(filesname[i]);
 
     Z3_context ctx = makeContext();
@@ -166,7 +164,9 @@ int main(int argc, char* argv[]) {
             break;
     }
 
-
+    /*freeing memory*/
     Z3_del_context(ctx);
+     for(int i = 0; i < nbGraph; i++)
+        deleteGraph(g[i]);
     return 0;
 }
